@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Achievements Stats</title>
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            color: #efeff1;
+            background: #18181b;
+            margin: 0;
+            padding: 12px;
+        }
+        h3 { margin: 0 0 8px; font-size: 16px; }
+        .stats { list-style: none; padding: 0; margin: 0 0 12px; }
+        .stats li {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            border-bottom: 1px solid #2f2f35;
+            font-size: 14px;
+        }
+        .stats li:last-child { border-bottom: none; }
+        .stats .value { font-weight: bold; color: #bf94ff; }
+        a {
+            color: #bf94ff;
+            text-decoration: none;
+            font-size: 13px;
+        }
+        a:hover { text-decoration: underline; }
+        .error { color: #eb0400; font-size: 13px; }
+        .loading { color: #adadb8; font-size: 13px; }
+    </style>
+</head>
+<body>
+    <div id="app"><span class="loading">Chargement...</span></div>
+
+    <script src="https://extension-files.twitch.tv/helper/v1/twitch-ext.min.js"></script>
+    <script src="panel.js"></script>
+</body>
+</html>
