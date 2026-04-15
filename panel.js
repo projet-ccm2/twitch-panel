@@ -1,6 +1,3 @@
-const API_BASE = 'https://achievement-management-dev-54587681968.europe-west1.run.app';
-const SITE_URL = 'https://front-dev-54587681968.europe-west1.run.app/'; // À personnaliser
-
 const twitch = window.Twitch.ext;
 const app = document.getElementById('app');
 
@@ -34,7 +31,6 @@ function fetchStats(channelId) {
         });
 }
 
-// Twitch fournit le channelId via onAuthorized
 twitch.onAuthorized(auth => {
     fetchStats(auth.channelId);
 });
