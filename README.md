@@ -54,7 +54,7 @@ The JWT is sent in the `Authorization: Bearer {token}` header on every request.
    GET {ACHIEVEMENT_API}/achievements/user/{userId}/channel/{channelId}
    ```
 
-3. **Leaderboard** ⚠️ _endpoint to be created_:
+3. **Leaderboard**:
    ```
    GET {ACHIEVEMENT_API}/achievements/channel/{channelId}/leaderboard?limit=10
    ```
