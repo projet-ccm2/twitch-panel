@@ -1,49 +1,80 @@
-# Twitch Panel — Achievements Stats
+# Twitch Panel — Achievements
 
-Panneau Twitch qui affiche les statistiques des succès (achievements) d'une chaîne.
+Twitch panel extension with two tabs:
 
-## Stats affichées
+- **Leaderboard** — top 10 users on the channel (top 3 displayed as a podium)
+- **My Stats** — personal achievement stats for the viewer on this channel
 
-- **Total** — nombre total de succès
-- **Actifs** — succès actifs
-- **Visibles** — succès publics
-- **Cachés** — succès secrets
+If the user does not exist in the system, a registration page with a link to the website is displayed.
 
-+ lien vers le site principal.
+## My Stats
+
+- **Completed** — number of finished achievements / total
+- **Total XP** — sum of rewards from completed achievements
+- **In Progress** — achievements started but not finished
+- **Completion** — completion rate in %
+
+## Leaderboard
+
+Top 10 of the channel, sorted by XP. Top 3 shown as a podium (gold, silver, bronze).
 
 ## Architecture
 
 ```
-config.js    ← URLs de l'API et du site (seul fichier à modifier)
-panel.html   ← page du panneau chargée par Twitch
-panel.js     ← logique : appel API + rendu des stats
+config.js    ← API URLs and site URL (only file to edit)
+panel.html   ← panel page loaded by Twitch
+panel.js     ← logic: tabs, API calls, rendering
 ```
 
 ## API
 
-L'appel se fait dynamiquement via le `channelId` fourni par le callback `twitch.onAuthorized()` du [Twitch Extensions Helper](https://dev.twitch.tv/docs/extensions/reference/#onauthorized) :
+Calls use `userId` (viewer) and `channelId` (channel) provided by `twitch.onAuthorized()` from the [Twitch Extensions Helper](https://dev.twitch.tv/docs/extensions/reference/#onauthorized):
 
 ```js
 twitch.onAuthorized(auth => {
-    // auth.channelId = l'ID numérique de la chaîne
+    // auth.userId    = viewer ID (the person visiting the channel)
+    // auth.channelId = channel ID (the streamer)
+    // auth.token     = JWT signed by Twitch
 });
 ```
 
-Endpoint appelé :
+The JWT is sent in the `Authorization: Bearer {token}` header on every request.
 
-```
-GET {API_BASE}/achievements/channel/{channelId}
-```
+### Endpoints
 
-`API_BASE` est défini dans `config.js`.
+1. **Check if user exists**:
+   ```
+   GET {USER_API}/{userId}
+   ```
+   - `200` → user exists
+   - `404` → registration page shown
 
-## Déploiement
+2. **Personal stats** (My Stats):
+   ```
+   GET {ACHIEVEMENT_API}/achievements/user/{userId}/channel/{channelId}
+   ```
 
-1. Zipper `config.js`, `panel.html` et `panel.js` **à la racine** du zip
-2. Uploader sur le [Twitch Developer Console](https://dev.twitch.tv/console/extensions)
-3. **Panel Viewer Path** : `panel.html`
-4. **Allowlist** : ajouter le domaine de l'API et du front
+3. **Leaderboard** ⚠️ _endpoint to be created_:
+   ```
+   GET {ACHIEVEMENT_API}/achievements/channel/{channelId}/leaderboard?limit=10
+   ```
+   Expected response (sorted by XP descending):
+   ```json
+   [
+     { "userId": "...", "username": "...", "xp": 150, "completed": 5 }
+   ]
+   ```
 
-## Prérequis
+`ACHIEVEMENT_API`, `USER_API` and `SITE_URL` are defined in `config.js`.
 
-L'API doit renvoyer les headers CORS (`Access-Control-Allow-Origin`) pour autoriser les requêtes depuis l'origin de l'extension Twitch.
+## Deployment
+
+1. Zip `config.js`, `panel.html` and `panel.js` **at the root** of the zip
+2. Upload on the [Twitch Developer Console](https://dev.twitch.tv/console/extensions)
+3. **Panel Viewer Path**: `panel.html`
+4. **Allowlist**: add API and frontend domains
+
+## Requirements
+
+- The API must return CORS headers to allow origins matching `*.ext-twitch.tv`
+- The API can verify the Twitch JWT using the extension's shared secret

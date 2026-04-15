@@ -1,16 +1,39 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Achievements Stats</title>
+    <title>Achievements Panel</title>
     <style>
         body {
             font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
             color: #efeff1;
             background: #18181b;
             margin: 0;
-            padding: 12px;
+            padding: 0;
         }
-        h3 { margin: 0 0 8px; font-size: 16px; }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid #2f2f35;
+        }
+        .tab {
+            flex: 1;
+            padding: 10px 0;
+            background: none;
+            border: none;
+            color: #adadb8;
+            font-size: 13px;
+            font-weight: bold;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+        }
+        .tab.active { color: #bf94ff; border-bottom-color: #bf94ff; }
+        .tab:hover { color: #efeff1; }
+
+        #tab-content { padding: 12px; }
+
+        /* Stats */
         .stats { list-style: none; padding: 0; margin: 0 0 12px; }
         .stats li {
             display: flex;
@@ -21,18 +44,73 @@
         }
         .stats li:last-child { border-bottom: none; }
         .stats .value { font-weight: bold; color: #bf94ff; }
-        a {
-            color: #bf94ff;
-            text-decoration: none;
-            font-size: 13px;
-        }
+
+        /* Links / Buttons */
+        a { color: #bf94ff; text-decoration: none; font-size: 13px; }
         a:hover { text-decoration: underline; }
+        .btn {
+            display: inline-block;
+            padding: 8px 16px;
+            background: #bf94ff;
+            color: #18181b;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: bold;
+            text-decoration: none;
+        }
+        .btn:hover { background: #a970ff; }
+
+        /* Register */
+        .register { text-align: center; padding: 20px 0; }
+        .register p { margin: 0 0 12px; font-size: 14px; color: #adadb8; }
+
+        /* States */
         .error { color: #eb0400; font-size: 13px; }
         .loading { color: #adadb8; font-size: 13px; }
+        .coming-soon { color: #adadb8; font-size: 13px; text-align: center; padding: 20px 0; }
+
+        /* Podium */
+        .podium {
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            gap: 6px;
+            margin-bottom: 12px;
+            padding: 8px 0;
+        }
+        .podium-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 8px 6px;
+            border-radius: 4px;
+            background: #2f2f35;
+            min-width: 70px;
+        }
+        .podium-item.rank-1 { border: 1px solid #ffd700; order: 2; }
+        .podium-item.rank-2 { border: 1px solid #c0c0c0; order: 1; }
+        .podium-item.rank-3 { border: 1px solid #cd7f32; order: 3; }
+        .medal { font-size: 20px; }
+        .podium-item .name { font-size: 11px; margin: 4px 0; color: #efeff1; }
+        .podium-item .xp { font-size: 11px; color: #bf94ff; font-weight: bold; }
+
+        /* Leaderboard list */
+        .lb-list { list-style: none; padding: 0; margin: 0; }
+        .lb-list li {
+            display: flex;
+            align-items: center;
+            padding: 6px 0;
+            border-bottom: 1px solid #2f2f35;
+            font-size: 13px;
+        }
+        .lb-list li:last-child { border-bottom: none; }
+        .lb-list .rank { width: 28px; color: #adadb8; }
+        .lb-list .name { flex: 1; }
+        .lb-list .xp { color: #bf94ff; font-weight: bold; }
     </style>
 </head>
 <body>
-    <div id="app"><span class="loading">Chargement...</span></div>
+    <div id="app"><span class="loading" style="padding:12px;display:block">Loading...</span></div>
 
     <script src="https://extension-files.twitch.tv/helper/v1/twitch-ext.min.js"></script>
     <script src="config.js"></script>
