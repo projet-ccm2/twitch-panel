@@ -40,7 +40,7 @@ function loadMyStats() {
     const content = document.getElementById('tab-content');
 
     if (USER_API) {
-        fetch(`${USER_API}/${encodeURIComponent(userId)}`, { headers: headers() })
+        fetch(`${USER_API}/users/${encodeURIComponent(userId)}`, { headers: headers() })
             .then(res => {
                 if (res.status === 404) { renderRegister(content); return; }
                 if (!res.ok) throw new Error(res.status);
@@ -147,7 +147,7 @@ function renderLeaderboardContent(content, data) {
 
 twitch.onAuthorized(auth => {
     token = auth.token;
-    userId = auth.userId;
+    userId = auth.userId.replace(/^U/, '');
     channelId = auth.channelId;
     renderTabs();
 });
