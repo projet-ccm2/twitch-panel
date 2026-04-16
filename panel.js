@@ -166,10 +166,12 @@ twitch.onAuthorized(auth => {
             <div class="register">
                 <p>Please share your identity to use this extension.</p>
                 <button class="btn" id="id-share-btn">Share my identity</button>
+                <p class="hint" id="id-share-hint" style="display:none;">Check the top of the Twitch page to accept.</p>
             </div>
         `;
         document.getElementById('id-share-btn').addEventListener('click', () => {
             twitch.actions.requestIdShare();
+            document.getElementById('id-share-hint').style.display = 'block';
         });
     }
 });
