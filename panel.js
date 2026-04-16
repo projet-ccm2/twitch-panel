@@ -149,29 +149,43 @@ function renderLeaderboardContent(content, data) {
 
 // ── Init ──
 
+function decodeJwtPayload(jwt) {
+    const base64 = jwt.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+    return JSON.parse(atob(base64));
+}
+
 twitch.onAuthorized(auth => {
     token = auth.token;
     channelId = auth.channelId;
 
-    const rawId = auth.userId;
+    // Try to get the real numeric user_id from the JWT payload
+    const jwt = decodeJwtPayload(auth.token);
+    console.log('JWT payload:', jwt);
 
-    // Twitch returns an opaque ID if the viewer hasn't shared their identity.
-    // A real Twitch user ID is numeric (possibly prefixed with "U").
-    if (/^\d+$/.test(rawId.replace(/^U/, ''))) {
-        userId = rawId.replace(/^U/, '');
+    const numericId = jwt.user_id || null;
+
+    if (numericId) {
+        userId = numericId;
         renderTabs();
     } else {
-        // Ask the viewer to share their real identity
-        app.innerHTML = `
-            <div class="register">
-                <p>Please share your identity to use this extension.</p>
-                <button class="btn" id="id-share-btn">Share my identity</button>
-                <p class="hint" id="id-share-hint" style="display:none;">Check the top of the Twitch page to accept.</p>
-            </div>
-        `;
-        document.getElementById('id-share-btn').addEventListener('click', () => {
-            twitch.actions.requestIdShare();
-            document.getElementById('id-share-hint').style.display = 'block';
-        });
+        // Fallback: check if auth.userId is numeric (broadcaster case)
+        const rawId = auth.userId.replace(/^U/, '');
+        if (/^\d+$/.test(rawId)) {
+            userId = rawId;
+            renderTabs();
+        } else {
+            // No real ID available — ask for identity share
+            app.innerHTML = `
+                <div class="register">
+                    <p>Please share your identity to use this extension.</p>
+                    <button class="btn" id="id-share-btn">Share my identity</button>
+                    <p class="hint" id="id-share-hint" style="display:none;">Check the top of the Twitch page to accept.</p>
+                </div>
+            `;
+            document.getElementById('id-share-btn').addEventListener('click', () => {
+                twitch.actions.requestIdShare();
+                document.getElementById('id-share-hint').style.display = 'block';
+            });
+        }
     }
 });
