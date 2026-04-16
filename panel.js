@@ -94,7 +94,9 @@ function renderMyStatsContent(content, data) {
             <li><span>Completion</span><span class="value">${rate}%</span></li>
         </ul>
         <a href="${SITE_URL}" target="_blank">View more on our site &rarr;</a>
+        <button class="btn reload-btn" id="reload-stats">&#x21bb; Reload</button>
     `;
+    document.getElementById('reload-stats').addEventListener('click', () => loadMyStats());
 }
 
 // ── Leaderboard tab ──
@@ -140,14 +142,34 @@ function renderLeaderboardContent(content, data) {
     content.innerHTML = `
         <div class="podium">${podiumHtml}</div>
         ${listHtml ? `<ul class="lb-list">${listHtml}</ul>` : ''}
+        <button class="btn reload-btn" id="reload-lb">&#x21bb; Reload</button>
     `;
+    document.getElementById('reload-lb').addEventListener('click', () => loadLeaderboard());
 }
 
 // ── Init ──
 
 twitch.onAuthorized(auth => {
     token = auth.token;
-    userId = auth.userId.replace(/^U/, '');
     channelId = auth.channelId;
-    renderTabs();
+
+    const rawId = auth.userId;
+
+    // Twitch returns an opaque ID if the viewer hasn't shared their identity.
+    // A real Twitch user ID is numeric (possibly prefixed with "U").
+    if (/^\d+$/.test(rawId.replace(/^U/, ''))) {
+        userId = rawId.replace(/^U/, '');
+        renderTabs();
+    } else {
+        // Ask the viewer to share their real identity
+        app.innerHTML = `
+            <div class="register">
+                <p>Please share your identity to use this extension.</p>
+                <button class="btn" id="id-share-btn">Share my identity</button>
+            </div>
+        `;
+        document.getElementById('id-share-btn').addEventListener('click', () => {
+            twitch.actions.requestIdShare();
+        });
+    }
 });
